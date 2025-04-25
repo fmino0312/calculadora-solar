@@ -17,4 +17,11 @@ interface ElectrodomesticoDao {
 
     @Query("DELETE FROM electrodomesticos")
     suspend fun eliminarTodos()
+
+    @Delete
+    suspend fun eliminar(electrodomestico: Electrodomestico)
+
+    @Update
+    suspend fun actualizar(electrodomestico: Electrodomestico)
+
 }

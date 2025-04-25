@@ -1,5 +1,6 @@
 package viu.actividad1.calculadorasolar.ui.screens.seleccion
 
+import viu.actividad1.calculadorasolar.data.Electrodomestico
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import viu.actividad1.calculadorasolar.ui.components.InputField
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 
 @Composable
 fun SeleccionScreen(
@@ -26,6 +28,12 @@ fun SeleccionScreen(
     var nombreNuevo by remember { mutableStateOf("") }
     var kwNuevo by remember { mutableStateOf("") }
     var consumoCalculado by remember { mutableStateOf(0.0) }
+
+    var showEditDialog by remember { mutableStateOf(false) }
+    var electrodomesticoAEditar by remember { mutableStateOf<Electrodomestico?>(null) }
+    var nuevoNombre by remember { mutableStateOf("") }
+    var nuevosWatts by remember { mutableStateOf("") }
+
 
     Scaffold { innerPadding ->
 
@@ -54,16 +62,48 @@ fun SeleccionScreen(
             Text("Disponibles:", style = MaterialTheme.typography.labelLarge)
             LazyColumn(modifier = Modifier.weight(2f)) {
                 items(disponibles) { item ->
-                    Button(
-                        onClick = { viewModel.agregarAEleccion(item) },
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     ) {
-                        Text("${item.nombre} (${item.potenciaWatts}W)")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("${item.nombre} (${item.potenciaWatts}W)")
+
+                            Row {
+                                IconButton(onClick = {
+                                    electrodomesticoAEditar = item
+                                    nuevoNombre = item.nombre
+                                    nuevosWatts = item.potenciaWatts.toString()
+                                    showEditDialog = true
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Editar")
+                                }
+                                IconButton(onClick = {
+                                    viewModel.eliminarDisponible(item)
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = { viewModel.agregarAEleccion(item) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            Text("Agregar a selección")
+                        }
                     }
                 }
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -200,5 +240,50 @@ fun SeleccionScreen(
                 }
             )
         }
+
+        if (showEditDialog && electrodomesticoAEditar != null) {
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                title = { Text("Editar Electrodoméstico") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = nuevoNombre,
+                            onValueChange = { nuevoNombre = it },
+                            label = { Text("Nombre") }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = nuevosWatts,
+                            onValueChange = { nuevosWatts = it },
+                            label = { Text("Consumo (W)") }
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        val nombre = nuevoNombre.trim()
+                        val potencia = nuevosWatts.toDoubleOrNull()?.toInt() ?: 0
+                        if (nombre.isNotEmpty() && potencia > 0) {
+                            electrodomesticoAEditar?.let {
+                                viewModel.actualizarElectrodomestico(it.copy(
+                                    nombre = nombre,
+                                    potenciaWatts = potencia
+                                ))
+                            }
+                            showEditDialog = false
+                        }
+                    }) {
+                        Text("Guardar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEditDialog = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
+        }
+
     }
 }

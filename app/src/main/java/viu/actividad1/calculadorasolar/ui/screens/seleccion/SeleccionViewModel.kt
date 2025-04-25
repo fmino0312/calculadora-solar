@@ -90,6 +90,22 @@ class SeleccionViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun eliminarDisponible(electrodomestico: Electrodomestico) {
+        viewModelScope.launch {
+            dao.eliminar(electrodomestico)
+        }
+    }
+
+    fun actualizarElectrodomestico(electrodomestico: Electrodomestico) {
+        viewModelScope.launch {
+            dao.actualizar(electrodomestico)
+        }
+    }
+
+
+
+
+
 
 
 
