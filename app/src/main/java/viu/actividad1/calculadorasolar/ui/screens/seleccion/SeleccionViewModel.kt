@@ -75,6 +75,14 @@ class SeleccionViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun agregarNuevoElectrodomestico(nombre: String, potencia: Double) {
+        viewModelScope.launch {
+            val nuevo = Electrodomestico(nombre = nombre, potenciaWatts = potencia.toInt())
+            dao.insertar(nuevo)
+        }
+    }
+
+
 
     private suspend fun precargarElectrodomesticos() {
         val lista = listOf(
