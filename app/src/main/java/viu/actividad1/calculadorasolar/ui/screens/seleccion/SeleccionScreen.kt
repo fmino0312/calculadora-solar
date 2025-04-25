@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import viu.actividad1.calculadorasolar.ui.components.InputField
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun SeleccionScreen(
@@ -31,8 +32,7 @@ fun SeleccionScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
 
         ) {
             Row(
@@ -76,7 +76,17 @@ fun SeleccionScreen(
                             .padding(4.dp)
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
-                            Text("${item.electrodomestico.nombre} (${item.electrodomestico.potenciaWatts}W)")
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("${item.electrodomestico.nombre} (${item.electrodomestico.potenciaWatts}W)")
+                                IconButton(onClick = {
+                                    viewModel.eliminarSeleccionado(index)
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+                                }
+                            }
 
                             var cantidad by rememberSaveable { mutableStateOf(item.cantidad.toString()) }
                             var horas by rememberSaveable { mutableStateOf(item.horasPorDia.toString()) }

@@ -82,6 +82,15 @@ class SeleccionViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun eliminarSeleccionado(index: Int) {
+        val nuevaLista = _seleccionados.value.toMutableList()
+        if (index in nuevaLista.indices) {
+            nuevaLista.removeAt(index)
+            _seleccionados.value = nuevaLista
+        }
+    }
+
+
 
 
     private suspend fun precargarElectrodomesticos() {
